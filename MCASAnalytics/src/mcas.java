@@ -87,10 +87,10 @@ public class mcas {
 		log.info("Getting Grade data for URL ("+url+")");
 		WebResponse   resp = wc.getResponse( url );
 		WebTable[] tables = resp.getTables();
-		if(DEBUG) System.out.println("Got ("+tables.length+") tables");
+		log.debug("Got ("+tables.length+") tables");
 		for(WebTable t: tables)
 		{
-			if(DEBUG) System.out.println("Table # Rows ("+t.getRowCount()+")");
+			log.debug("Table # Rows ("+t.getRowCount()+")");
 		}
 		WebTable outerDataTable = tables[1]; //second table
 		
@@ -131,8 +131,8 @@ public class mcas {
 		
 		int numRows = t.getRowCount();
 		int numCols = t.getColumnCount();
-		if(DEBUG) System.out.println("Got ("+numRows+") rows");
-		if(DEBUG) System.out.println("Got ("+numCols+") cols");
+		log.debug("Got ("+numRows+") rows");
+		log.debug("Got ("+numCols+") cols");
 
 		for(int i=2; i< numRows; i++)
 		{
@@ -140,11 +140,11 @@ public class mcas {
 			String rank = t.getCellAsText(i, COL_RANK).trim();
 			if(!schoolNameCache.contains(name))
 				schoolNameCache.add(name);
-			if(DEBUG2) System.out.println(area + " ["+name+"] --> ["+rank+"] ");
+			log.debug(area + " ["+name+"] --> ["+rank+"] ");
 			if(!dataMap.containsKey(name))
 				dataMap.put(name,new Integer(rank));
 			else
-				System.err.println("Map already contains ("+name+")");
+				log.error("Map already contains ("+name+")");
 		}
 		return dataMap;
 	}
@@ -158,9 +158,9 @@ public class mcas {
 		{
 			count++;
 			String name = iter.next();
-			if(DEBUG2) System.out.println("#"+count+") "+name);
+			log.debug("#"+count+") "+name);
 		}
-		System.out.println("There are "+schoolNameCache.size()+" schools");
+		log.info("There are "+schoolNameCache.size()+" schools");
 	}
 	
 	private void doAnalyses()
@@ -173,23 +173,23 @@ public class mcas {
 			count++;
 			String name = iter.next();
 			double avgRank = getAverageRank(name);
-			if(DEBUG) System.out.println("School System ["+name+"] Rank ["+avgRank+"]");
+			log.debug("School System ["+name+"] Rank ["+avgRank+"]");
 			if(!rankings.containsKey(avgRank))
 				rankings.put(avgRank, name);
 			else
-				System.out.println("WARN Duplicate rankings on ("+avgRank+") for ("+name+")");
+				log.warn("Duplicate rankings on ("+avgRank+") for ("+name+")");
 		}
 		
 		Iterator<Double> iter2 = rankings.keySet().iterator();
-		System.out.println("***************************");
-		System.out.println("*    R A N K I N G S      *");
-		System.out.println("***************************");
+		log.info("***************************");
+		log.info("*    R A N K I N G S      *");
+		log.info("***************************");
 		NumberFormat formatter = new DecimalFormat("#0.00");
 		while(iter2.hasNext())
 		{
 			Double rank = iter2.next();
 			String name = rankings.get(rank);
-			System.out.println(formatter.format(rank) + " "+name);
+			log.info(formatter.format(rank) + " "+name);
 		}
 	}
 	
@@ -290,7 +290,7 @@ public class mcas {
 		}
 		if(numRankings==0)
 		{
-			System.out.println("WARN No rankings for ("+name+") ");
+			log.warn("No rankings for ("+name+") ");
 			return 0;
 		}
 		else
