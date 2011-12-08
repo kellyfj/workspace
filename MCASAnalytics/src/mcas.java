@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.HttpUnitOptions;
@@ -22,12 +23,15 @@ import com.meterware.httpunit.WebTable;
 /***
  * Get the MCAS grades, munge them and then report the average ranking
  * @author kellyfj
+ * @todo Add log4j rather than SOP
+ * @todo better handling of schools tied for the same ranking
  */
 public class mcas {
 	public final static boolean DEBUG = false;
 	public final static boolean DEBUG2 = false;
 	public final static String PROXY_HOST = "172.16.39.201"; //"172.19.160.51";
 	public final static int PROXY_PORT = 8080;
+	private static final Logger  log = Logger.getLogger(mcas.class);
 	private static final int YEAR = 2010;
 	int COL_RANK = 0;
 	int COL_NAME = 1;
@@ -52,7 +56,7 @@ public class mcas {
 	SortedMap<Double,String> rankings = new TreeMap<Double,String>();
 	private WebConversation wc;
 	
-	public void doHttpUnit() throws IOException, SAXException
+	public void getTheData() throws IOException, SAXException
 	{
 		 wc = new WebConversation();
 		 HttpUnitOptions.setScriptingEnabled( false );
@@ -67,7 +71,7 @@ public class mcas {
 				getGradeData(3,GradeMap3English, GradeMap3Math, null);
 	}
 	
-	private void getGradeData(int grade, Map english, Map math, Map science) throws IOException, SAXException
+	private void getGradeData(int grade, Map<String,Integer> english, Map<String,Integer> math, Map<String,Integer> science) throws IOException, SAXException
 	{
 		String url = null;
 		if(YEAR==2010)
@@ -80,7 +84,7 @@ public class mcas {
 		if(grade==3)
 			url = url.replace("th", "rd");
 		
-		System.out.println("Getting Grade data for URL ("+url+")");
+		log.info("Getting Grade data for URL ("+url+")");
 		WebResponse   resp = wc.getResponse( url );
 		WebTable[] tables = resp.getTables();
 		if(DEBUG) System.out.println("Got ("+tables.length+") tables");
@@ -115,6 +119,12 @@ public class mcas {
 		}
 	}
 	
+	/**
+	 * Extract the data from the WebTable
+	 * @param area
+	 * @param t
+	 * @return Map of School Name --> Ranking
+	 */
 	private Map<String, Integer> extractData(String area, WebTable t)
 	{
 		Map<String, Integer> dataMap = new HashMap<String,Integer>();
@@ -183,6 +193,12 @@ public class mcas {
 		}
 	}
 	
+	/**
+	 * For a School - look into each HashMap and calculate the schools average ranking across
+	 * all the Maps
+	 * @param name
+	 * @return
+	 */
 	private double getAverageRank(String name) {
 		
 		double total=0;
@@ -285,7 +301,7 @@ public class mcas {
 	{
 		mcas m = new mcas();
 		try {
-			m.doHttpUnit();
+			m.getTheData();
 			m.printSchoolNames();
 			m.doAnalyses();
 		} catch (IOException e) {
