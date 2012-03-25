@@ -25,6 +25,8 @@ import com.meterware.httpunit.WebTable;
  * @author kellyfj
  * @todo Add log4j rather than SOP
  * @todo better handling of schools tied for the same ranking
+ * @todo more javadoc of methods
+ * @todo figure a better set of internal data structures than N maps
  */
 public class mcas {
 	public final static boolean DEBUG = false;
