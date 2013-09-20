@@ -34,7 +34,7 @@ public class mcas {
 	public final static String PROXY_HOST = "172.16.39.201"; //"172.19.160.51";
 	public final static int PROXY_PORT = 8080;
 	private static final Logger  log = Logger.getLogger(mcas.class);
-	private static final int YEAR = 2010;
+	private static final int YEAR = 2013;
 	int COL_RANK = 0;
 	int COL_NAME = 1;
 	Set<String> schoolNameCache = new HashSet<String>();
@@ -76,7 +76,9 @@ public class mcas {
 	private void getGradeData(int grade, Map<String,Integer> english, Map<String,Integer> math, Map<String,Integer> science) throws IOException, SAXException
 	{
 		String url = null;
-		if(YEAR==2010)
+		if(YEAR==2013)
+	         url = "http://www.boston.com/news/special/education/mcas/scores13/"+grade+"th_top_districts.html";
+		else  if(YEAR==2010)
 		 url = "http://www.boston.com/news/special/education/mcas/scores10/"+grade+"th_top_districts.htm";
 		 else if(YEAR==2009)
 			 url = "http://www.boston.com/news/special/education/mcas/scores09/"+grade+"th_top_districts.htm";
